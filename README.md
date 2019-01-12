@@ -4,7 +4,7 @@
 
 `$ npm install git+https://github.com/gmarcz/react-native-text-detector.git --save`
 or
-`$yarn add git+https://github.com/gmarcz/react-native-text-detector.git`
+`$ yarn add git+https://github.com/gmarcz/react-native-text-detector.git`
 
 ### Manual installation
 
@@ -25,7 +25,7 @@ Please create project on firebase console, Download a GoogleService-Info.plist f
     pod update && pod install
 ```
 4. Use `<your_project>.xcworkspace` to run your app
-5. InXcode include GoogleService-Info.plist in your app
+5. In Xcode include GoogleService-Info.plist in your app
 6. Configure Firebase, edit `ios/<your_project>/AppDelegate.m` import Firebase `@import Firebase;` and configure the library `[FIRApp configure];`
 ```bash
     ...
@@ -95,7 +95,27 @@ Please create project on firebase console, Download a GoogleService-Info.plist f
     }
     ```
 
-## Usage
+## Example usage with react-native-camera (ios)
+
+1.  Install react-native-camera
+
+`$ npm install --save react-native-camera`
+or
+`$ yarn add react-native-camera`
+
+2.  Link the library
+
+`$ react-native link react-native-camera`
+
+3. In Xcode add permission for camera `Info.plist`
+
+```
+<key>NSCameraUsageDescription</key>
+<string>Your message to user when the camera is accessed for the first time</string>
+
+<key>NSMicrophoneUsageDescription</key>
+<string>Your message to user when the microphone is accessed for the first time</string>
+```
 
 ```javascript
 /**
@@ -104,26 +124,72 @@ Please create project on firebase console, Download a GoogleService-Info.plist f
  *
  */
 
+import React from 'react';
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { RNCamera } from 'react-native-camera';
 import RNTextDetector from "react-native-text-detector";
 
 export class TextDetectionComponent extends PureComponent {
-  ...
 
-  detectText = async () => {
-    try {
-      const options = {
-        quality: 0.8,
-        base64: true,
-        skipProcessing: true,
-      };
-      const { uri } = await this.camera.takePictureAsync(options);
-      const visionResp = await RNTextDetector.detectFromUri(uri);
-      console.log('visionResp', visionResp);
-    } catch (e) {
-      console.warn(e);
+  takePicture = async () => {
+    if (this.camera) {
+        try {
+          const options = {
+            quality: 0.8,
+            skipProcessing: true,
+          };
+          const { uri } = await this.camera.takePictureAsync(options);
+          const visionResp = await RNTextDetector.detectFromUri(uri);
+          console.log('visionResp', visionResp);
+        } catch (e) {
+          console.warn(e);
+        }
     }
   };
 
-  ...
+  render() {
+    return (
+      <View style={styles.container}>
+        <RNCamera
+            ref={comp => { this.camera = comp; }}
+            style = {styles.preview}
+            type={RNCamera.Constants.Type.back}
+            flashMode={RNCamera.Constants.FlashMode.on}
+            permissionDialogTitle={'Permission to use camera'}
+            permissionDialogMessage={'We need your permission to use your camera phone'}
+        />
+        <View style={{flex: 0, flexDirection: 'row', justifyContent: 'center',}}>
+        <TouchableOpacity
+            onPress={this.takePicture}
+            style = {styles.capture}
+        >
+            <Text style={{fontSize: 14}}> SNAP </Text>
+        </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    flexDirection: 'column',
+    backgroundColor: 'black'
+  },
+  preview: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    alignItems: 'center'
+  },
+  capture: {
+    flex: 0,
+    backgroundColor: '#fff',
+    borderRadius: 5,
+    padding: 15,
+    paddingHorizontal: 20,
+    alignSelf: 'center',
+    margin: 20
+  }
+});
 ```
