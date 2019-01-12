@@ -8,14 +8,13 @@ Pod::Spec.new do |s|
   s.license        = package['license']
   s.author         = package['author']
   s.homepage       = package['homepage']
-  s.platform       = :ios, "7.0"
-  s.source         = { :git => "https://github.com/zsajjad/react-native-text-detector.git", :tag => "master" }
+  s.platform       = :ios, "9.0"
+  s.source         = { :git => "https://github.com/gmarcz/react-native-text-detector.git", :tag => "master" }
   s.source_files   = "*.{h,m}"
   s.requires_arc   = true
 
 
   s.dependency     "React"
-#  s.dependency     'TesseractOCRiOS', '~> 4.0.0'
   s.dependency     'Firebase/Core'
   s.dependency     'Firebase/MLVision'
   s.dependency     'Firebase/MLVisionTextModel'
